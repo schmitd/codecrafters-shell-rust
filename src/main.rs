@@ -1,4 +1,4 @@
-#[allow(unused_imports)]
+use std::env::var_os;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
@@ -39,15 +39,23 @@ fn type_command(program: &str) -> () {
 }
 
 fn is_executable(program: &str) -> bool {
-    for path in std::env::var("PATH").unwrap_or_default().split(':') {
-        let file = Path::join(Path::new(path), program);
-        if !file.exists() {
-            return false;
-        }
-        let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
-        if permissions & 0o111 != 0 {
-            return true;
+    if let Some(path) = std::env::var_os("PATH") {
+        for dir in std::env::split_paths(&path) {
+            let file = Path::join(Path::new(&dir), program);
+            if !file.exists() {
+                return false;
+            }
+            let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
+            if permissions & 0o111 != 0 {
+                return true;
+            }
         }
     }
+
     return false;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 }
