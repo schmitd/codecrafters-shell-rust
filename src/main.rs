@@ -37,16 +37,13 @@ fn is_executable(program: &str) -> bool {
         for dir in std::env::split_paths(&path) {
             let file = Path::join(Path::new(&dir), program);
             if !file.exists() {
+                println!("{:#?} does not exist", file);
                 return false;
             }
             let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
             println!("{:#?}", permissions);
             if permissions & 0o111 != 0 {
-                println!(
-                    "{} is {}",
-                    program,
-                    std::env::var("PATH").unwrap_or_default()
-                );
+                println!("{} is {}", program, file.display());
                 return true;
             }
         }
