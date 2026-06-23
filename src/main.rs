@@ -1,8 +1,9 @@
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
+use std::result;
 
-fn main() {
+fn main() -> result::Result<(), std::io::Error> {
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -14,18 +15,17 @@ fn main() {
             ["exit"] => break,
             ["echo", args @ ..] => echo_command(args),
             ["type", program, _rest @ ..] => type_command(program),
-            [program, args @ ..] => run_command(program, args),
+            [program, args @ ..] => run_command(program, args)?,
             &_ => println!("{}: command not found", command[0].trim()),
         }
     }
 }
 
-fn run_command(program: &str, args: &[&str]) -> () {
+fn run_command(program: &str, args: &[&str]) -> Result<(), std::io::Error> {
     if let Some(file) = which_executable(program) {
-        if let Some(out) = std::process::Command::new(file).args(args).output().ok() {
-            println!("{}", String::from_utf8_lossy(&out.stdout));
-        }
+        let _status = std::process::Command::new(file).args(args).status()?;
     }
+    Ok(())
 }
 
 fn echo_command(arg: &[&str]) -> () {
