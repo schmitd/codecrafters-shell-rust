@@ -46,6 +46,7 @@ fn is_executable(program: &str) -> bool {
                 return false;
             }
             let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
+            println!("{:#?}", permissions);
             if permissions & 0o111 != 0 {
                 return true;
             }
