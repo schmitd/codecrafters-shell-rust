@@ -1,3 +1,5 @@
+mod command;
+use command::Command;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
@@ -10,13 +12,13 @@ fn main() -> result::Result<(), std::io::Error> {
         let mut command = String::new();
         io::stdin().read_line(&mut command).unwrap();
         command = command.trim().to_string();
-        let command: Vec<&str> = command.split_whitespace().collect();
-        match command.as_slice() {
-            ["exit"] => break Ok(()),
-            ["echo", args @ ..] => echo_command(args),
-            ["type", program, _rest @ ..] => type_command(program),
-            [program, args @ ..] => run_command(program, args)?,
-            &_ => println!("{}: command not found", command[0].trim()),
+        let [command, rest @ ..] = command.split_whitespace().collect().as_slice();
+        match Command::from_string(command) {
+            Command::Exit => break Ok(()),
+            Command::Echo => echo_command(rest),
+            Command::Type => type_command(rest[0]),
+            Command::Pwd => pwd_command(),
+            Command::External(_) => run_command(command, rest)?,
         }
     }
 }
@@ -31,6 +33,10 @@ fn run_command(program: &str, args: &[&str]) -> Result<(), std::io::Error> {
         return Ok(());
     }
     Ok(())
+}
+
+fn pwd_command() -> () {
+    println!("{}", std::env::current_dir().unwrap().display())
 }
 
 fn echo_command(arg: &[&str]) -> () {
