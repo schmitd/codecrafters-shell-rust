@@ -39,11 +39,12 @@ fn is_executable(program: &str) -> bool {
             // if !file.exists() {
             //     println!("debug:{:#?} does not exist", file);
             // }
-            let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
-            println!("{:#?}", permissions);
-            if permissions & 0o111 != 0 {
-                println!("{} is {}", program, file.display());
-                return true;
+            if let Some(meta) = std::fs::metadata(&file).ok() {
+                let permissions = meta.permissions().mode();
+                if permissions & 0o111 != 0 {
+                    println!("{} is {}", program, file.display());
+                    return true;
+                }
             }
         }
     }
