@@ -22,10 +22,9 @@ fn main() {
 
 fn run_command(program: &str, args: &[&str]) -> () {
     if let Some(file) = which_executable(program) {
-        std::process::Command::new(file)
-            .args(args)
-            .status()
-            .unwrap_or_default();
+        if let Some(out) = std::process::Command::new(file).args(args).output().ok() {
+            println!("{}", String::from_utf8_lossy(&out.stdout));
+        }
     }
 }
 
