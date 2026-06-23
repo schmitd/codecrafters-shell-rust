@@ -9,14 +9,14 @@ fn main() {
         io::stdin().read_line(&mut command).unwrap();
         command = command.trim().to_string();
         let command: Vec<&str> = command.split_whitespace().collect();
-        match command[0] {
-            "exit" => break,
-            "echo" => echo(command[1]),
+        match command.as_slice() {
+            ["exit"] => break,
+            ["echo", args @ ..] => echo(args),
             &_ => println!("{}: command not found", command[0].trim()),
         }
     }
 }
 
-fn echo(arg: &str) -> () {
-    println!("{}", arg)
+fn echo(arg: &[&str]) -> () {
+    println!("{}", arg.join(" "))
 }
