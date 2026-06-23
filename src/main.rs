@@ -12,7 +12,7 @@ fn main() -> result::Result<(), std::io::Error> {
         command = command.trim().to_string();
         let command: Vec<&str> = command.split_whitespace().collect();
         match command.as_slice() {
-            ["exit"] => break,
+            ["exit"] => break Ok(()),
             ["echo", args @ ..] => echo_command(args),
             ["type", program, _rest @ ..] => type_command(program),
             [program, args @ ..] => run_command(program, args)?,
