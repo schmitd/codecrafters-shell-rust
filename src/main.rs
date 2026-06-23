@@ -24,7 +24,7 @@ fn echo_command(arg: &[&str]) -> () {
 
 fn type_command(program: &str) -> () {
     if program == "exit" || program == "echo" || program == "type" {
-        println!("{}: is a shell builtin", program)
+        println!("{} is a shell builtin", program)
     } else {
         println!("{}: not found", program)
     }
