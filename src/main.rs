@@ -1,5 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::os::unix::fs::PermissionsExt;
+use std::path::Path;
 
 fn main() {
     loop {
@@ -25,7 +27,27 @@ fn echo_command(arg: &[&str]) -> () {
 fn type_command(program: &str) -> () {
     if program == "exit" || program == "echo" || program == "type" {
         println!("{} is a shell builtin", program)
+    } else if is_executable(program) {
+        println!(
+            "{} is {}",
+            program,
+            std::env::var("PATH").unwrap_or_default()
+        )
     } else {
         println!("{}: not found", program)
     }
+}
+
+fn is_executable(program: &str) -> bool {
+    for path in std::env::var("PATH").unwrap_or_default().split(':') {
+        let file = Path::join(Path::new(path), program);
+        if !file.exists() {
+            return false;
+        }
+        let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
+        if permissions & 0o111 != 0 {
+            return true;
+        }
+    }
+    return false;
 }
