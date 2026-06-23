@@ -8,9 +8,14 @@ fn main() {
         let mut command = String::new(); 
         io::stdin().read_line(&mut command).unwrap();
         command = command.trim().to_string();
-        if command == "exit"{
-            break;
+        match &command[..] {
+            "exit" => break,
+            "echo" => echo(&command),
+            &_ => println!("{}: command not found", command.trim()),
         }
-        println!("{}: command not found", command.trim());
     }
+}
+
+fn echo(arg: &String) -> () {
+    println!("{}", arg)
 }
