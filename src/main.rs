@@ -38,7 +38,6 @@ fn is_executable(program: &str) -> bool {
             let file = Path::join(Path::new(&dir), program);
             if !file.exists() {
                 println!("debug:{:#?} does not exist", file);
-                return false;
             }
             let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
             println!("{:#?}", permissions);
@@ -48,7 +47,6 @@ fn is_executable(program: &str) -> bool {
             }
         }
     }
-
     return false;
 }
 
