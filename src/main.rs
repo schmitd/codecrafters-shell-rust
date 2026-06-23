@@ -11,12 +11,21 @@ fn main() {
         let command: Vec<&str> = command.split_whitespace().collect();
         match command.as_slice() {
             ["exit"] => break,
-            ["echo", args @ ..] => echo(args),
+            ["echo", args @ ..] => echo_command(args),
+            ["type", program] => type_command(program),
             &_ => println!("{}: command not found", command[0].trim()),
         }
     }
 }
 
-fn echo(arg: &[&str]) -> () {
+fn echo_command(arg: &[&str]) -> () {
     println!("{}", arg.join(" "))
+}
+
+fn type_command(program: &str) -> () {
+    if program == "exit" || program == "echo" || program == "type" {
+        println!("{}: is a shell builtin", program)
+    } else {
+        println!("{}: not found", program)
+    }
 }
