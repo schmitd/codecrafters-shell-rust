@@ -23,7 +23,10 @@ fn main() -> result::Result<(), std::io::Error> {
 
 fn run_command(program: &str, args: &[&str]) -> Result<(), std::io::Error> {
     if let Some(file) = which_executable(program) {
-        let _status = std::process::Command::new(file).args(args).status()?;
+        let _status =
+            std::process::Command::new(file.components().collect::<Vec<_>>().as_slice()[0])
+                .args(args)
+                .status()?;
     }
     Ok(())
 }
