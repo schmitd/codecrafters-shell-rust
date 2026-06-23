@@ -36,6 +36,10 @@ fn is_executable(program: &str) -> bool {
     if let Some(path) = std::env::var_os("PATH") {
         for dir in std::env::split_paths(&path) {
             let file = Path::join(Path::new(&dir), program);
+            if !file.exists() {
+                println!("debug:{:#?} does not exist", file);
+                return false;
+            }
             let permissions = std::fs::metadata(&file).unwrap().permissions().mode();
             println!("{:#?}", permissions);
             if permissions & 0o111 != 0 {
