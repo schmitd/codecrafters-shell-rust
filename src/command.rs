@@ -1,4 +1,4 @@
-use strum::{Display, EnumString};
+use strum::{Display, EnumString, FromStr};
 
 #[derive(Debug, PartialEq, EnumString, Display)]
 #[strum(ascii_case_insensitive)]
