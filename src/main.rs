@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn main() {
     loop {
@@ -14,8 +14,18 @@ fn main() {
             ["exit"] => break,
             ["echo", args @ ..] => echo_command(args),
             ["type", program, _rest @ ..] => type_command(program),
+            [program, args @ ..] => run_command(program, args),
             &_ => println!("{}: command not found", command[0].trim()),
         }
+    }
+}
+
+fn run_command(program: &str, args: &[&str]) -> () {
+    if let Some(file) = which_executable(program) {
+        std::process::Command::new(file)
+            .args(args)
+            .status()
+            .unwrap_or_default();
     }
 }
 
@@ -26,13 +36,14 @@ fn echo_command(arg: &[&str]) -> () {
 fn type_command(program: &str) -> () {
     if program == "exit" || program == "echo" || program == "type" {
         println!("{} is a shell builtin", program)
-    } else if is_executable(program) {
+    } else if let Some(file) = which_executable(program) {
+        println!("{} is {}", program, file.display());
     } else {
         println!("{}: not found", program)
     }
 }
 
-fn is_executable(program: &str) -> bool {
+fn which_executable(program: &str) -> Option<PathBuf> {
     if let Some(path) = std::env::var_os("PATH") {
         for dir in std::env::split_paths(&path) {
             let file = Path::join(Path::new(&dir), program);
@@ -42,13 +53,12 @@ fn is_executable(program: &str) -> bool {
             if let Some(meta) = std::fs::metadata(&file).ok() {
                 let permissions = meta.permissions().mode();
                 if permissions & 0o111 != 0 {
-                    println!("{} is {}", program, file.display());
-                    return true;
+                    return Some(file);
                 }
             }
         }
     }
-    return false;
+    return None;
 }
 
 #[cfg(test)]
