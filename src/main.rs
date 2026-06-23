@@ -26,6 +26,9 @@ fn run_command(program: &str, args: &[&str]) -> Result<(), std::io::Error> {
         let _status = std::process::Command::new(file.file_name().unwrap())
             .args(args)
             .status()?;
+    } else {
+        println!("{}: command not found", program);
+        return Ok(());
     }
     Ok(())
 }
