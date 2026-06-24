@@ -50,6 +50,7 @@ fn cd_command(dir: &str) -> Result<(), std::io::Error> {
     {
         std::env::set_current_dir(home.join(base))?;
     } else {
+        println!("no tilde prefix, setting current dir to {:#?}", dir);
         env::set_current_dir(dir)?;
     }
     Ok(())
