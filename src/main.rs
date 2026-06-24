@@ -43,7 +43,9 @@ fn pwd_command() -> () {
 }
 
 fn cd_command(dir: &str) -> () {
-    std::env::set_current_dir(dir).unwrap()
+    if let Err(msg) = std::env::set_current_dir(dir) {
+        println!("{}", msg);
+    }
 }
 
 fn echo_command(arg: &[&str]) -> () {
