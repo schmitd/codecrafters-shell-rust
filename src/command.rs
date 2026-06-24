@@ -20,7 +20,7 @@ impl FromStr for Command {
     type Err = std::convert::Infallible;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match Self::from_str_strum(s) {
+        match Self::from_str(s) {
             Ok(builtin) => Ok(builtin),
             Err(_) => Ok(Command::External(s.to_string())),
         }
