@@ -12,8 +12,8 @@ fn main() -> result::Result<(), std::io::Error> {
         let mut command = String::new();
         io::stdin().read_line(&mut command).unwrap();
         command = command.trim().to_string();
-        let [command, rest @ ..] = command.split_whitespace().collect().as_slice();
-        match Command::from_string(command) {
+        let [command, rest @ ..] = command.split_whitespace().as_slice();
+        match Command::from_str(command) {
             Command::Exit => break Ok(()),
             Command::Echo => echo_command(rest),
             Command::Type => type_command(rest[0]),
