@@ -22,7 +22,7 @@ fn main() -> result::Result<(), std::io::Error> {
             Command::Internal(BuiltIn::Type) => type_command(rest[0]),
             Command::Internal(BuiltIn::Pwd) => pwd_command(),
             Command::Internal(BuiltIn::Cd) => cd_command(rest[0])
-                .unwrap_or(println!("cd: {}: No such file or directory", rest[0])),
+                .unwrap_or_else(|_| println!("cd: {}: No such file or directory", rest[0])),
             Command::External(_) => run_command(command, rest)?,
         }
     }
@@ -50,7 +50,6 @@ fn cd_command(dir: &str) -> Result<(), std::io::Error> {
     {
         std::env::set_current_dir(home.join(base))?;
     } else {
-        println!("no tilde prefix, setting current dir to {:#?}", dir);
         env::set_current_dir(dir)?;
     }
     Ok(())
