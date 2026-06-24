@@ -1,5 +1,5 @@
 mod command;
-use command::Command;
+use command::{BuiltIn, Command};
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
@@ -9,17 +9,17 @@ fn main() -> result::Result<(), std::io::Error> {
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
-        let mut command = String::new();
-        io::stdin().read_line(&mut command).unwrap();
-        let command: Vec<_> = command.trim().split_whitespace().collect();
-        let [command, rest @ ..] = command.as_slice() else {
+        let mut toks = String::new();
+        io::stdin().read_line(&mut toks).unwrap();
+        let toks: Vec<_> = toks.trim().split_whitespace().collect();
+        let [command, rest @ ..] = toks.as_slice() else {
             continue;
         };
         match Command::from(*command) {
-            Command::Exit => break Ok(()),
-            Command::Echo => echo_command(rest),
-            Command::Type => type_command(rest[0]),
-            Command::Pwd => pwd_command(),
+            Command::Internal(BuiltIn::Exit) => break Ok(()),
+            Command::Internal(BuiltIn::Echo) => echo_command(rest),
+            Command::Internal(BuiltIn::Type) => type_command(rest[0]),
+            Command::Internal(BuiltIn::Pwd) => pwd_command(),
             Command::External(_) => run_command(command, rest)?,
         }
     }
@@ -46,8 +46,8 @@ fn echo_command(arg: &[&str]) -> () {
 }
 
 fn type_command(program: &str) -> () {
-    if program == "exit" || program == "echo" || program == "type" {
-        println!("{} is a shell builtin", program)
+    if let Command::Internal(builtin) = program.into() {
+        println!("{} is a shell builtin", builtin)
     } else if let Some(file) = which_executable(program) {
         println!("{} is {}", program, file.display());
     } else {
