@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use strum::{Display, EnumString};
 
 #[derive(Debug, PartialEq, EnumString, Display)]
@@ -12,17 +11,6 @@ pub enum Command {
     Type,
     #[strum(to_string = "pwd")]
     Pwd,
-    #[strum(disabled)]
+    #[strum(default)]
     External(String),
-}
-
-impl FromStr for Command {
-    type Err = std::convert::Infallible;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match Self::from_str(s) {
-            Ok(builtin) => Ok(builtin),
-            Err(_) => Ok(Command::External(s.to_string())),
-        }
-    }
 }

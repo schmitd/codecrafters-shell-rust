@@ -11,9 +11,11 @@ fn main() -> result::Result<(), std::io::Error> {
         io::stdout().flush().unwrap();
         let mut command = String::new();
         io::stdin().read_line(&mut command).unwrap();
-        command = command.trim().to_string();
-        let [command, rest @ ..] = command.split_whitespace().as_slice();
-        match Command::from_str(command) {
+        let command: Vec<_> = command.trim().split_whitespace().collect();
+        let [command, rest @ ..] = command.as_slice() else {
+            continue;
+        };
+        match Command::from(*command) {
             Command::Exit => break Ok(()),
             Command::Echo => echo_command(rest),
             Command::Type => type_command(rest[0]),
