@@ -20,6 +20,7 @@ fn main() -> result::Result<(), std::io::Error> {
             Command::Internal(BuiltIn::Echo) => echo_command(rest),
             Command::Internal(BuiltIn::Type) => type_command(rest[0]),
             Command::Internal(BuiltIn::Pwd) => pwd_command(),
+            Command::Internal(BuiltIn::Cd) => cd_command(rest[0]),
             Command::External(_) => run_command(command, rest)?,
         }
     }
@@ -39,6 +40,10 @@ fn run_command(program: &str, args: &[&str]) -> Result<(), std::io::Error> {
 
 fn pwd_command() -> () {
     println!("{}", std::env::current_dir().unwrap().display())
+}
+
+fn cd_command(dir: &str) -> () {
+    std::env::set_current_dir(dir).unwrap()
 }
 
 fn echo_command(arg: &[&str]) -> () {

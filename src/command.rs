@@ -12,11 +12,13 @@ pub enum BuiltIn {
     Type,
     #[strum(to_string = "pwd")]
     Pwd,
+    #[strum(to_string = "cd")]
+    Cd,
 }
 
 pub enum Command {
     Internal(BuiltIn),
-    External(String),
+    External((String)),
 }
 
 impl From<&str> for Command {
