@@ -44,7 +44,7 @@ fn pwd_command() -> () {
 }
 
 fn cd_command(dir: &str) -> () {
-    if let Some(base) = dir.strip_prefix("~").or(Some(dir))
+    if let Some(base) = dir.strip_prefix("~")
         && let Some(home) = env::home_dir()
     {
         std::env::set_current_dir(home.join(base)).ok();
