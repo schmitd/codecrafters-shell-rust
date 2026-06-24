@@ -1,5 +1,6 @@
 mod command;
 use command::{BuiltIn, Command};
+use std::env;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
@@ -42,9 +43,14 @@ fn pwd_command() -> () {
     println!("{}", std::env::current_dir().unwrap().display())
 }
 
-fn cd_command(dir: &str) -> () {
-    if let Err(_) = std::env::set_current_dir(dir) {
-        println!("cd: {}: No such file or directory", dir);
+fn cd_command(dir: &Path) -> () {
+    if let Ok(base) = dir.strip_prefix("~")
+        && let Some(home) = env::home_dir()
+    {
+        std::env::set_current_dir(home.join(base));
+    } else {
+        std::env::set_current_dir(dir);
+        println!("cd: {}: No such file or directory", dir.display());
     }
 }
 
