@@ -18,7 +18,7 @@ pub enum BuiltIn {
 
 pub enum Command {
     Internal(BuiltIn),
-    External((String)),
+    External(String),
 }
 
 impl From<&str> for Command {

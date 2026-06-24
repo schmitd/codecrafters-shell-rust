@@ -43,14 +43,14 @@ fn pwd_command() -> () {
     println!("{}", std::env::current_dir().unwrap().display())
 }
 
-fn cd_command(dir: &Path) -> () {
-    if let Ok(base) = dir.strip_prefix("~")
+fn cd_command(dir: &str) -> () {
+    if let Some(base) = dir.strip_prefix("~").or(Some(dir))
         && let Some(home) = env::home_dir()
     {
-        std::env::set_current_dir(home.join(base));
+        std::env::set_current_dir(home.join(base)).ok();
     } else {
-        std::env::set_current_dir(dir);
-        println!("cd: {}: No such file or directory", dir.display());
+        std::env::set_current_dir(dir).ok();
+        println!("cd: {}: No such file or directory", dir);
     }
 }
 
