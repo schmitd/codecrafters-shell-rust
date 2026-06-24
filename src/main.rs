@@ -44,7 +44,7 @@ fn pwd_command() -> () {
 
 fn cd_command(dir: &str) -> () {
     if let Err(msg) = std::env::set_current_dir(dir) {
-        println!("{}", msg);
+        println!("cd: {}: No such file or directory", dir);
     }
 }
 
