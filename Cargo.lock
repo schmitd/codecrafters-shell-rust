@@ -20,6 +20,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bytes",
+ "shell-words",
  "strum",
  "thiserror",
 ]
@@ -47,6 +48,12 @@ checksum = "dfbc457d0c7a0759a614551b11a6409e5951f6c7537be1f1b7682b9ae9230368"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "shell-words"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc6fe69c597f9c37bfeeeeeb33da3530379845f10be461a66d16d03eca2ded77"
 
 [[package]]
 name = "strum"

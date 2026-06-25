@@ -1,5 +1,8 @@
+extern crate shell_words;
 mod command;
+
 use command::{BuiltIn, Command};
+use shell_words::split;
 use std::env;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
@@ -12,8 +15,9 @@ fn main() -> result::Result<(), std::io::Error> {
         io::stdout().flush().unwrap();
         let mut toks = String::new();
         io::stdin().read_line(&mut toks).unwrap();
-        let toks: Vec<_> = toks.trim().split_whitespace().collect();
-        let [command, rest @ ..] = toks.as_slice() else {
+        let toks = split(&toks).unwrap();
+        let toks: Vec<&str> = toks.iter().map(|s| s.as_str()).collect();
+        let [command, rest @ ..]: &[&str] = toks.as_slice() else {
             continue;
         };
         match Command::from(*command) {
