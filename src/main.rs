@@ -1,10 +1,11 @@
 extern crate shell_words;
 mod command;
+mod parse;
 
 use command::{BuiltIn, Command};
-use shell_words::split;
+// use shell_words::split;
 use std::env;
-use std::io::{self, Write};
+use std::io::{self, Error, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::result;
@@ -16,23 +17,36 @@ fn main() -> result::Result<(), std::io::Error> {
         let mut toks = String::new();
         io::stdin().read_line(&mut toks).unwrap();
         let toks = split(&toks).unwrap();
-        let toks: Vec<&str> = toks.iter().map(|s| s.as_str()).collect();
-        let [command, rest @ ..]: &[&str] = toks.as_slice() else {
-            continue;
-        };
-        match Command::from(*command) {
-            Command::Internal(BuiltIn::Exit) => break Ok(()),
-            Command::Internal(BuiltIn::Echo) => echo_command(rest),
-            Command::Internal(BuiltIn::Type) => type_command(rest[0]),
-            Command::Internal(BuiltIn::Pwd) => pwd_command(),
-            Command::Internal(BuiltIn::Cd) => cd_command(rest[0])
-                .unwrap_or_else(|_| println!("cd: {}: No such file or directory", rest[0])),
-            Command::External(_) => run_command(command, rest)?,
+        for tok in toks {
+            // each redirect creates a file and reassigns standard out
+            // currently run command
+            // OK so I guess its time to make a pratt parser
+            // lets do a custom lexer too lol, to handle redirects that touch words
         }
+        // let toks: Vec<&str> = toks.iter().map(|s| s.as_str()).collect();
+        // let [command, rest @ ..]: &[&str] = toks.as_slice() else {
+        //     continue;
+        // };
+
+        // move to body
+        // process_command(command, rest)?;
     }
 }
 
-fn run_command(program: &str, args: &[&str]) -> Result<(), std::io::Error> {
+fn process_command(command: &str, rest: &[&str]) -> Result<(), std::io::Error> {
+    match Command::from(command) {
+        Command::Internal(BuiltIn::Exit) => std::process::exit(0),
+        Command::Internal(BuiltIn::Echo) => echo_command(rest),
+        Command::Internal(BuiltIn::Type) => type_command(rest[0]),
+        Command::Internal(BuiltIn::Pwd) => pwd_command(),
+        Command::Internal(BuiltIn::Cd) => cd_command(rest[0])
+            .unwrap_or_else(|_| println!("cd: {}: No such file or directory", rest[0])),
+        Command::External(_) => run_command(command, rest)?,
+    }
+    Ok(())
+}
+
+fn run_command(program: &str, args: &[&str], redirects: &[Redirect]) -> Result<(), std::io::Error> {
     if let Some(file) = which_executable(program) {
         let _status = std::process::Command::new(file.file_name().unwrap())
             .args(args)

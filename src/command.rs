@@ -2,17 +2,12 @@ use std::str::FromStr;
 use strum::{Display, EnumString};
 
 #[derive(Debug, PartialEq, EnumString, Display)]
-#[strum(ascii_case_insensitive)]
+#[strum(ascii_case_insensitive, serialize_all = "lowercase")]
 pub enum BuiltIn {
-    #[strum(to_string = "exit")]
     Exit,
-    #[strum(to_string = "echo")]
     Echo,
-    #[strum(to_string = "type")]
     Type,
-    #[strum(to_string = "pwd")]
     Pwd,
-    #[strum(to_string = "cd")]
     Cd,
 }
 
